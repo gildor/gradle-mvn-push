@@ -24,7 +24,7 @@ def isReleaseBuild() {
 }
 
 def getReleaseRepositoryUrl() {
-    def BASE_URL='https://bintray.com/'
+    def BASE_URL='https://api.bintray.com/content/'
     def login = hasProperty('BINTRAY_LOGIN')? BINTRAY_LOGIN : "bandlab"
     def version = hasProperty('BINTRAY_VERSION')? BINTRAY_VERSION : VERSION_NAME
     if (hasProperty('BINTRAY_NAME')) {
