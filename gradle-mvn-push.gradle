@@ -17,13 +17,14 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
 
-BASE_URL='https://bintray.com/'
+
 
 def isReleaseBuild() {
     return VERSION_NAME.contains("SNAPSHOT") == false
 }
 
 def getReleaseRepositoryUrl() {
+    def BASE_URL='https://bintray.com/'
     def login = hasProperty('BINTRAY_LOGIN')? BINTRAY_LOGIN : "bandlab"
     def version = hasProperty('BINTRAY_VERSION')? BINTRAY_VERSION : VERSION_NAME
     if (hasProperty('BINTRAY_NAME')) {
