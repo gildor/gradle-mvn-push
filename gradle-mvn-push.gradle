@@ -17,15 +17,17 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
 
-BASE_URL='https://bintray.com/bandlab/maven/'
+BASE_URL='https://bintray.com/'
 
 def isReleaseBuild() {
     return VERSION_NAME.contains("SNAPSHOT") == false
 }
 
 def getReleaseRepositoryUrl() {
-    if (hasProperty('BINTRAY_NAME') && hasProperty('BINTRAY_VERSION')) {
-        return "$BASE_URL$BINTRAY_NAME/$BINTRAY_VERSION"
+    def login = hasProperty('BINTRAY_LOGIN')? BINTRAY_LOGIN : "bandlab"
+    def version = hasProperty('BINTRAY_VERSION')? BINTRAY_VERSION : VERSION_NAME
+    if (hasProperty('BINTRAY_NAME')) {
+        return "$BASE_URL$login/maven/$BINTRAY_NAME/$version"
     }
     return "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
 }
