@@ -3,11 +3,31 @@ gradle-mvn-push
 
 See this blog post for more context on this 'library': [http://chris.banes.me/2013/08/27/pushing-aars-to-maven-central/](http://chris.banes.me/2013/08/27/pushing-aars-to-maven-central/).
 
+## Usage with Bintray
+If you already have Maven upload config (if not you see manual below) and want upload library to Bintray you should:
+* Set login data for Bintray for your user to `~/.gradle/gradle.properties`: `BINTRAY_LOGIN` and `BINTRAY_API_KEY`
+* Add `BINTRAY_NAME` to project `gradle.properties`. It's name of project on Bintray. Also this variable is flag "This build should be uploaded to Bintray"
+* apply plugin to build.gradle: `apply from: 'https://raw.github.com/bandlab/gradle-mvn-push/master/gradle-mvn-push.gradle'`
+
+
+###Optional###
+If it's modified version of another library from Maven Central or jCenter you should add `BINTRAY_VERSION_POSTFIX` variable to project `gradle.properties`
+for simple include your modified dependency to your project.
+
+For example:
+
+Original library dependency:
+```compile 'com.rengwuxian.materialedittext:library:2.0.3@aar'```
+
+Modified library dependency with `BINTRAY_VERSION_POSTFIX=without-nineoldandroid`:
+```compile 'com.rengwuxian.materialedittext:library:2.0.3-without-nineoldandroid@aar'```
+
+Also you can replace original library version (for example above it equals `2.0.3`) with variable `BINTRAY_VERSION`
 
 ## Usage
 
 ### 1. Have a working Gradle build
-This is upto you.
+This is up to you.
 
 ### 2. Update your home gradle.properties
 
@@ -61,7 +81,7 @@ POM_PACKAGING=aar
 Add the following at the end of each `build.gradle` that you wish to upload:
 
 ```groovy
-apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
+apply from: 'https://raw.github.com/bandlab/gradle-mvn-push/master/gradle-mvn-push.gradle'
 ```
 
 ### 6. Build and Push

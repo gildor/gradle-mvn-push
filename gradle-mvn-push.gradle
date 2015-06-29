@@ -23,27 +23,43 @@ def isReleaseBuild() {
     return VERSION_NAME.contains("SNAPSHOT") == false
 }
 
-def getReleaseRepositoryUrl() {
-    def BASE_URL='https://api.bintray.com/content/'
-    def login = hasProperty('BINTRAY_LOGIN')? BINTRAY_LOGIN : "bandlab"
+def getBintrayRepositoryUrl() {
     def version = hasProperty('BINTRAY_VERSION')? BINTRAY_VERSION : VERSION_NAME
-    if (hasProperty('BINTRAY_NAME')) {
-        return "$BASE_URL$login/maven/$BINTRAY_NAME/$version"
+    return "https://api.bintray.com/content/${BINTRAY_LOGIN}/maven/$BINTRAY_NAME/$version"
+}
+
+def getReleaseRepositoryUrl() {
+    if (isBintrayUpload()) {
+        return getBintrayRepositoryUrl()
+    } else {
+        return hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL
+                : "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
     }
-    return "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
 }
 
 def getSnapshotRepositoryUrl() {
-    return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL
-            : "https://oss.sonatype.org/content/repositories/snapshots/"
+    if (isBintrayUpload()) {
+        return getBintrayRepositoryUrl()
+    } else {
+        return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL
+                : "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
 }
 
 def getRepositoryUsername() {
-    return hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : ""
+    return isBintrayUpload() ? BINTRAY_LOGIN : hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : ""
 }
 
 def getRepositoryPassword() {
-    return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
+    return isBintrayUpload() ? BINTRAY_API_KEY : hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
+}
+
+def isBintrayUpload() {
+    return hasProperty('BINTRAY_NAME')
+}
+
+def getBintrayVersionPostfix() {
+    return isBintrayUpload() && hasProperty('BINTRAY_VERSION_POSTFIX') ? "-${BINTRAY_VERSION_POSTFIX}" : ""
 }
 
 afterEvaluate { project ->
@@ -54,7 +70,7 @@ afterEvaluate { project ->
 
                 pom.groupId = GROUP
                 pom.artifactId = POM_ARTIFACT_ID
-                pom.version = VERSION_NAME
+                pom.version = VERSION_NAME + getBintrayVersionPostfix()
 
                 repository(url: getReleaseRepositoryUrl()) {
                     authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
